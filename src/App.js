@@ -16,6 +16,42 @@ const App = () => {
         "Holiday planning"
     ]);
 
+    const data = {
+        summary: "The meeting discussed project timelines, addressed client concerns, and planned next steps for the product launch.",
+        memberQuestions: [
+            "What is the expected delivery date for the first milestone?",
+            "How will client feedback be incorporated into the next sprint?"
+        ],
+        agentResponses: [
+            "The first milestone is scheduled for completion by July 15th.",
+            "Client feedback will be reviewed in the upcoming team meeting and integrated into the sprint backlog."
+        ],
+        actionsAgreed: [
+            "Send updated project timeline to the client by end of week.",
+            "Schedule a follow-up meeting for next Tuesday.",
+            "Prepare a summary report of client feedback."
+        ],
+        sentiment: "positive",
+        isResolved: true
+    };
+
+    const createHttpRequest = async (body_data, httprequest, url, type) => {
+        let chatHistory = messages.map(msg => ({
+            role: msg.type === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.text }]
+        }));
+        chatHistory.push({ role: "user", parts: [{ text: userInput }] });
+        const payload = { contents: chatHistory };
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        return result
+    }
+
     useEffect(() => {
         scrollToBottom();
         setIsSidebarOpen(true)
@@ -47,23 +83,9 @@ const App = () => {
         if (userInput.trim() !== '') {
             setIsLoading(true);
             try {
-                let chatHistory = messages.map(msg => ({
-                    role: msg.type === 'user' ? 'user' : 'model',
-                    parts: [{ text: msg.text }]
-                }));
-                chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-
-                const payload = { contents: chatHistory };
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
+                const apiKey = ""
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
+                const result = await createHttpRequest("payload", "POST", url)
 
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
@@ -168,20 +190,80 @@ const App = () => {
                         >
                             <div
                                 className={`p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg shadow-md ${msg.type === 'user'
-                                        ? 'bg-blue-500 text-white rounded-br-none'
-                                        : msg.type === 'assistant'
-                                            ? 'bg-gray-200 text-gray-800 rounded-bl-none'
-                                            : 'bg-yellow-100 text-yellow-800 border border-yellow-300' // For info messages
+                                    ? 'bg-blue-500 text-white rounded-br-none'
+                                    : msg.type === 'assistant'
+                                        ? 'bg-gray-200 text-gray-800 rounded-bl-none'
+                                        : 'bg-yellow-100 text-yellow-800 border border-yellow-300' // For info messages
                                     }`}
                             >
+                                {console.log(msg.text + "===>", msg.type)}
                                 {msg.text}
                                 {msg.file && (
                                     <div className="text-sm mt-1 opacity-80">
                                         <i className="fas fa-paperclip mr-1"></i>
-                                        <span className="font-semibold">{msg.file}</span>
+                                        <span className="font-semibold">ssss{msg.file} sss</span>
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    ))}
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            {msg.type === "info" && (
+                                <table style={{
+                                    borderCollapse: 'collapse',
+                                    width: '70%',
+                                    border: '1px solid black'
+                                }}>
+                                    <thead>
+                                        <tr>
+                                            <th style={{ border: '1px solid black' }}>Section</th>
+                                            <th style={{ border: '1px solid black' }}>Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Summary</td>
+                                            <td style={{ border: '1px solid black' }}>{data.summary}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Member Questions</td>
+                                            <td style={{ border: '1px solid black' }}>
+                                                <ul>
+                                                    {data.memberQuestions.map((q, idx) => <li key={idx}>{q}</li>)}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Agent Responses</td>
+                                            <td style={{ border: '1px solid black' }}>
+                                                <ul>
+                                                    {data.agentResponses.map((res, idx) => <li key={idx}>{res}</li>)}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Actions Agreed</td>
+                                            <td style={{ border: '1px solid black' }}>
+                                                <ul>
+                                                    {data.actionsAgreed.map((action, idx) => <li key={idx}>{action}</li>)}
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Sentiment</td>
+                                            <td style={{ border: '1px solid black' }}>{data.sentiment}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Is Resolved?</td>
+                                            <td style={{ border: '1px solid black' }}>{data.isResolved ? "Yes ✅" : "No ❌"}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     ))}
                     {isLoading && (
