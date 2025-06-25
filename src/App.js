@@ -4,6 +4,7 @@ const App = () => {
     const [messages, setMessages] = useState([]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [fileData, setFileData] = useState()
     const fileInputRef = useRef(null);
     const messagesEndRef = useRef(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,25 +16,6 @@ const App = () => {
         "Frontend development tips",
         "Holiday planning"
     ]);
-
-    const data = {
-        summary: "The meeting discussed project timelines, addressed client concerns, and planned next steps for the product launch.",
-        memberQuestions: [
-            "What is the expected delivery date for the first milestone?",
-            "How will client feedback be incorporated into the next sprint?"
-        ],
-        agentResponses: [
-            "The first milestone is scheduled for completion by July 15th.",
-            "Client feedback will be reviewed in the upcoming team meeting and integrated into the sprint backlog."
-        ],
-        actionsAgreed: [
-            "Send updated project timeline to the client by end of week.",
-            "Schedule a follow-up meeting for next Tuesday.",
-            "Prepare a summary report of client feedback."
-        ],
-        sentiment: "positive",
-        isResolved: true
-    };
 
     const createHttpRequest = async (body_data, httprequest, url, type) => {
         let chatHistory = messages.map(msg => ({
@@ -83,8 +65,14 @@ const App = () => {
         if (userInput.trim() !== '') {
             setIsLoading(true);
             try {
+
+                //Call summarization
+                /*
+                    http://44.223.11.40:8001/upload-call
+                */
                 const apiKey = ""
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
+                //const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
+                const url = `http://44.223.11.40:8001/upload-call`
                 const result = await createHttpRequest("payload", "POST", url)
 
                 if (result.candidates && result.candidates.length > 0 &&
@@ -116,12 +104,31 @@ const App = () => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        if (file) {
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { type: 'info', text: `File selected: ${file.name}` }
-            ]);
-        }
+
+        if (!file) return;
+        setMessages((prevMessages) => [
+            ...prevMessages,
+            { type: 'info', text: `File selected: ${file.name}` }
+        ]);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('http://44.223.11.40:8001/upload-call', {
+            method: 'POST',
+            body: formData,
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setFileData(data)
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        type: 'file_data'
+                    }
+                ]);
+            })
+            .catch((err) => console.error('Error:', err));
     };
     const handleUploadButtonClick = () => {
         fileInputRef.current?.click();
@@ -135,7 +142,6 @@ const App = () => {
         }
         setPreviousChats(prev => [`New Chat ${prev.length + 1}`, ...prev]);
     };
-
     return (
         <div className="flex h-screen bg-gray-100 font-sans antialiased overflow-hidden">
             <div className={` w-64 bg-gray-900 text-white p-4 shadow-lg z-10`}>
@@ -212,7 +218,7 @@ const App = () => {
                             key={index}
                             className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            {msg.type === "info" && (
+                            {msg.type === "file_data" && (
                                 <table style={{
                                     borderCollapse: 'collapse',
                                     width: '70%',
@@ -226,40 +232,21 @@ const App = () => {
                                     </thead>
                                     <tbody>
                                         <tr>
+                                            <td style={{ border: '1px solid black' }}>Transcript</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['transcript']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Entities</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['entities']}</td>
+                                        </tr>
+                                        <tr>
                                             <td style={{ border: '1px solid black' }}>Summary</td>
-                                            <td style={{ border: '1px solid black' }}>{data.summary}</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['summary']}</td>
                                         </tr>
+
                                         <tr>
-                                            <td style={{ border: '1px solid black' }}>Member Questions</td>
-                                            <td style={{ border: '1px solid black' }}>
-                                                <ul>
-                                                    {data.memberQuestions.map((q, idx) => <li key={idx}>{q}</li>)}
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ border: '1px solid black' }}>Agent Responses</td>
-                                            <td style={{ border: '1px solid black' }}>
-                                                <ul>
-                                                    {data.agentResponses.map((res, idx) => <li key={idx}>{res}</li>)}
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ border: '1px solid black' }}>Actions Agreed</td>
-                                            <td style={{ border: '1px solid black' }}>
-                                                <ul>
-                                                    {data.actionsAgreed.map((action, idx) => <li key={idx}>{action}</li>)}
-                                                </ul>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ border: '1px solid black' }}>Sentiment</td>
-                                            <td style={{ border: '1px solid black' }}>{data.sentiment}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ border: '1px solid black' }}>Is Resolved?</td>
-                                            <td style={{ border: '1px solid black' }}>{data.isResolved ? "Yes ✅" : "No ❌"}</td>
+                                            <td style={{ border: '1px solid black' }}>Recommendations</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['recommendations']}</td>
                                         </tr>
                                     </tbody>
                                 </table>

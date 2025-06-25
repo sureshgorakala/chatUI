@@ -1,0 +1,12 @@
+RAG API
+
+file Upload : http://44.223.11.40:8000/api/upload
+query       : http://44.223.11.40:8000/api/query
+
+Swagger Url : http://44.223.11.40:8000/docs
+
+
+
+Call Summarizer API
+Upload :     http://44.223.11.40:8001/upload-call
+Swagger Url : ht
