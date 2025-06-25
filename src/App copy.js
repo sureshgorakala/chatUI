@@ -65,9 +65,13 @@ const App = () => {
         if (userInput.trim() !== '') {
             setIsLoading(true);
             try {
-                
-                console.log("newMessage", newMessage)
 
+                //Call summarization
+                /*
+                    http://44.223.11.40:8001/upload-call
+                */
+                const apiKey = ""
+                //const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
                 const url = `http://44.223.11.40:8001/upload-call`
                 const result = await createHttpRequest("payload", "POST", url)
 
@@ -99,7 +103,6 @@ const App = () => {
     };
 
     const handleFileChange = (event) => {
-        setIsLoading(true);
         const file = event.target.files[0];
 
         if (!file) return;
@@ -121,10 +124,9 @@ const App = () => {
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
-                        type: 'file_data', text: JSON.stringify(data)
+                        type: 'file_data'
                     }
                 ]);
-                setIsLoading(false);
             })
             .catch((err) => console.error('Error:', err));
     };
@@ -157,7 +159,7 @@ const App = () => {
                 </div>
 
                 <nav className="flex-1 overflow-y-auto custom-scrollbar">
-                    <h3 className="text-sm font-semibold text-gray-400 mb-3">Previous Chats [Coming Soon!!] </h3>
+                    <h3 className="text-lg font-semibold text-gray-400 mb-3">Previous Chats</h3>
                     <ul>
                         {previousChats.map((chat, index) => (
                             <li key={index} className="mb-2">
@@ -187,78 +189,70 @@ const App = () => {
                             Start a conversation or upload a file!
                         </div>
                     )}
-                    {messages.map((msg, index) => {
-
-                        let displayed_filedata = null;
-                        if (msg.type === "file_data") {
-                            displayed_filedata = JSON.parse(msg.text)
-                        }
-
-
-                        return (
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
                             <div
-                                key={index}
-                                className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                className={`p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg shadow-md ${msg.type === 'user'
+                                    ? 'bg-blue-500 text-white rounded-br-none'
+                                    : msg.type === 'assistant'
+                                        ? 'bg-gray-200 text-gray-800 rounded-bl-none'
+                                        : 'bg-yellow-100 text-yellow-800 border border-yellow-300' // For info messages
+                                    }`}
                             >
-                                <div
-                                    className={`p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg shadow-md ${msg.type === 'user'
-                                        ? 'bg-blue-500 text-white rounded-br-none'
-                                        : msg.type === 'assistant'
-                                            ? 'bg-gray-200 text-gray-800 rounded-bl-none'
-                                            : 'bg-yellow-100 text-yellow-800 border' // For info messages
-                                        }`}
-                                >
-                                    {msg.type != "file_data" && (
-                                        <div>
-                                            {msg.text}
-                                        </div>
-                                    )}
-                                    {displayed_filedata != null &&
-                                        <table style={{
-                                            borderCollapse: 'collapse',
-                                            border: '1px solid black',
-                                            maxWidth:'87rem !important',
-                                            background: 'transperant'
-                                        }}>
-                                            <thead>
-                                                <tr>
-                                                    <th style={{ border: '1px solid black' }}>Section</th>
-                                                    <th style={{ border: '1px solid black' }}>Details</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Transcript</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['transcript']}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Entities</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['entities']}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Summary</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['summary']}</td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Recommendations</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['recommendations']}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    }
-
-                                    {msg.file && (
-                                        <div className="text-sm mt-1 opacity-80">
-                                            <i className="fas fa-paperclip mr-1"></i>
-                                            <span className="font-semibold">{msg.file}</span>
-                                        </div>
-                                    )}
-                                </div>
+                                {console.log(msg.text + "===>", msg.type)}
+                                {msg.text}
+                                {msg.file && (
+                                    <div className="text-sm mt-1 opacity-80">
+                                        <i className="fas fa-paperclip mr-1"></i>
+                                        <span className="font-semibold">ssss{msg.file} sss</span>
+                                    </div>
+                                )}
                             </div>
-                        )
-                    }
-                    )}
+                        </div>
+                    ))}
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            {msg.type === "file_data" && (
+                                <table style={{
+                                    borderCollapse: 'collapse',
+                                    width: '70%',
+                                    border: '1px solid black'
+                                }}>
+                                    <thead>
+                                        <tr>
+                                            <th style={{ border: '1px solid black' }}>Section</th>
+                                            <th style={{ border: '1px solid black' }}>Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Transcript</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['transcript']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Entities</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['entities']}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Summary</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['summary']}</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style={{ border: '1px solid black' }}>Recommendations</td>
+                                            <td style={{ border: '1px solid black' }}>{fileData['recommendations']}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    ))}
                     {isLoading && (
                         <div className="flex justify-start">
                             <div className="p-3 rounded-lg bg-gray-200 text-gray-800 rounded-bl-none shadow-md">
@@ -267,7 +261,7 @@ const App = () => {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Please Wait...
+                                    Typing...
                                 </div>
                             </div>
                         </div>
