@@ -242,8 +242,10 @@ const App = () => {
                                         }`}
                                 >
                                     {msg.type != "file_data" && (
-                                        <div style={{padding:"5px",background:'#E2ECF6',
-                                                color:'#000000'}}>
+                                        <div style={{
+                                            padding: "5px", background: '#E2ECF6',
+                                            color: '#000000', width: (!msg.text.includes("File selected") && msg.type != 'user') ? '100rem' : 'auto'
+                                        }}>
                                             {msg.text}
                                         </div>
                                     )}
@@ -254,8 +256,8 @@ const App = () => {
                                                 borderCollapse: 'collapse',
                                                 border: '1px solid black',
                                                 padding: '10px',
-                                                background:'#E2ECF6',
-                                                color:'#000000',
+                                                background: '#E2ECF6',
+                                                color: '#000000',
                                                 width: '100rem'
                                             }}>
                                                 <thead>
