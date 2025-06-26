@@ -4,19 +4,13 @@ const App = () => {
     const [messages, setMessages] = useState([]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [fileData, setFileData] = useState()
     const fileInputRef = useRef(null);
     const messagesEndRef = useRef(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef(null);
 
     const [previousChats, setPreviousChats] = useState([
-        "Chat about React components",
-        "Discussion on AI models",
-        "Project ideas brainstorm",
-        "Frontend development tips",
-        "Holiday planning"
+        "Previous chat here"
     ]);
 
     const toggleMenu = () => setIsOpen(prev => !prev);
@@ -60,7 +54,6 @@ const App = () => {
 
     useEffect(() => {
         scrollToBottom();
-        setIsSidebarOpen(true)
     }, [messages]);
 
     const scrollToBottom = () => {
@@ -139,7 +132,6 @@ const App = () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                setFileData(data)
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
@@ -266,12 +258,7 @@ const App = () => {
                                             </table>
                                         }
                                     </div>
-                                    {msg.file && (
-                                        <div className="text-sm mt-1 opacity-80">
-                                            <i className="fas fa-paperclip mr-1"></i>
-                                            <span className="font-semibold">{msg.file}</span>
-                                        </div>
-                                    )}
+                                    
                                 </div>
                             </div>
                         )
