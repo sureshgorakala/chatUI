@@ -126,7 +126,25 @@ const App = () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        fetch('http://44.223.11.40:8001/upload-call', {
+        console.log("====>", file)
+
+        const allowedAudioExtensions = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma'];
+
+
+        const fileName = file.name;
+        const extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
+        let url = null
+        let isAudio = false;
+        if (allowedAudioExtensions.includes(extension)) {
+            isAudio = true;
+            url = 'http://44.223.11.40:8001/upload-call'
+        } else {
+            url = 'http://44.223.11.40:8000/api/upload'
+        }
+
+
+        fetch(url, {
             method: 'POST',
             body: formData,
         })
@@ -135,7 +153,7 @@ const App = () => {
                 setMessages((prevMessages) => [
                     ...prevMessages,
                     {
-                        type: 'file_data', text: JSON.stringify(data)
+                        type: 'file_data', text: JSON.stringify(data), genere: isAudio
                     }
                 ]);
                 setIsLoading(false);
@@ -160,7 +178,7 @@ const App = () => {
             <div className={` w-64 bg-gray-900 text-white p-4 shadow-lg z-10`}>
                 <div className="mb-6">
                     <h2 className="text-3xl font-bold text-blue-400 mb-4 flex items-center">
-                        <i className="fas fa-gem mr-2 text-blue-300"></i>Trafodian
+                        <i className="fas fa-gem mr-2 text-blue-300"></i>Trafodion
                     </h2>
                     <button
                         onClick={handleNewChat}
@@ -216,7 +234,7 @@ const App = () => {
                                 className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 <div
-                                    className={`p-3 rounded-lg max-w-xs sm:max-w-md md:max-w-lg shadow-md ${msg.type === 'user'
+                                    className={`rounded-lg max-w-xs sm:max-w-md md:max-w-lg shadow-md ${msg.type === 'user'
                                         ? 'bg-blue-500 text-white rounded-br-none'
                                         : msg.type === 'assistant'
                                             ? 'bg-gray-200 text-gray-800 rounded-bl-none'
@@ -224,16 +242,21 @@ const App = () => {
                                         }`}
                                 >
                                     {msg.type != "file_data" && (
-                                        <div>
+                                        <div style={{padding:"5px",background:'#E2ECF6',
+                                                color:'#000000'}}>
                                             {msg.text}
                                         </div>
                                     )}
-                                    <div>
-                                        {displayed_filedata != null &&
+
+                                    {(displayed_filedata != null && msg.genere) &&
+                                        <div>
                                             <table style={{
                                                 borderCollapse: 'collapse',
                                                 border: '1px solid black',
                                                 padding: '10px',
+                                                background:'#E2ECF6',
+                                                color:'#000000',
+                                                width: '100rem'
                                             }}>
                                                 <thead>
                                                     <tr>
@@ -256,9 +279,10 @@ const App = () => {
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        }
-                                    </div>
-                                    
+                                        </div>
+                                    }
+
+
                                 </div>
                             </div>
                         )
@@ -291,28 +315,11 @@ const App = () => {
                         onClick={handleUploadButtonClick}
                         className="p-3 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
                         title="Upload File"
-                        style={{ position: 'relative', display: 'inline-block' }} 
+                        style={{ position: 'relative', display: 'inline-block' }}
                         ref={menuRef}
                     >
                         <i className="fas fa-paperclip text-xl"></i>
                     </button>
-
-                    {isOpen && (
-                        <div style={{
-                            position: 'absolute',
-                            top: '100%',
-                            left: 0,
-                            backgroundColor: '#fff',
-                            border: '1px solid #ccc',
-                            padding: '10px',
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-                            zIndex: 1000,
-                        }}>
-                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 1</div>
-                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 2</div>
-                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 3</div>
-                        </div>
-                    )}
 
                     <input
                         type="text"
