@@ -8,6 +8,8 @@ const App = () => {
     const fileInputRef = useRef(null);
     const messagesEndRef = useRef(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef(null);
 
     const [previousChats, setPreviousChats] = useState([
         "Chat about React components",
@@ -17,13 +19,24 @@ const App = () => {
         "Holiday planning"
     ]);
 
-    const createHttpRequest = async (body_data, httprequest, url, type) => {
+    const toggleMenu = () => setIsOpen(prev => !prev);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const createHttpRequest = async (url) => {
         let chatHistory = messages.map(msg => ({
             role: msg.type === 'user' ? 'user' : 'model',
             parts: [{ text: msg.text }]
         }));
         chatHistory.push({ role: "user", parts: [{ text: userInput }] });
-        const payload = { contents: chatHistory };
+        const payload = { "query": userInput };
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -33,6 +46,17 @@ const App = () => {
         const result = await response.json();
         return result
     }
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
 
     useEffect(() => {
         scrollToBottom();
@@ -65,16 +89,14 @@ const App = () => {
         if (userInput.trim() !== '') {
             setIsLoading(true);
             try {
-                
+
                 console.log("newMessage", newMessage)
 
-                const url = `http://44.223.11.40:8001/upload-call`
-                const result = await createHttpRequest("payload", "POST", url)
+                const url = `http://44.223.11.40:8000/api/query`
+                const result = await createHttpRequest(url)
 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const assistantResponse = result.candidates[0].content.parts[0].text;
+                if (result.answer && result.answer.length > 0) {
+                    const assistantResponse = result.answer;
                     setMessages((prevMessages) => [
                         ...prevMessages,
                         { type: 'assistant', text: assistantResponse }
@@ -129,6 +151,7 @@ const App = () => {
             .catch((err) => console.error('Error:', err));
     };
     const handleUploadButtonClick = () => {
+        //setIsOpen(prev => !prev);
         fileInputRef.current?.click();
     };
 
@@ -138,7 +161,7 @@ const App = () => {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
-        setPreviousChats(prev => [`New Chat ${prev.length + 1}`, ...prev]);
+        //setPreviousChats(prev => [`New Chat ${prev.length + 1}`, ...prev]);
     };
     return (
         <div className="flex h-screen bg-gray-100 font-sans antialiased overflow-hidden">
@@ -213,41 +236,36 @@ const App = () => {
                                             {msg.text}
                                         </div>
                                     )}
-                                    {displayed_filedata != null &&
-                                        <table style={{
-                                            borderCollapse: 'collapse',
-                                            border: '1px solid black',
-                                            maxWidth:'87rem !important',
-                                            background: 'transperant'
-                                        }}>
-                                            <thead>
-                                                <tr>
-                                                    <th style={{ border: '1px solid black' }}>Section</th>
-                                                    <th style={{ border: '1px solid black' }}>Details</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Transcript</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['transcript']}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Entities</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['entities']}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Summary</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['summary']}</td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style={{ border: '1px solid black' }}>Recommendations</td>
-                                                    <td style={{ border: '1px solid black' }}>{displayed_filedata['recommendations']}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    }
-
+                                    <div>
+                                        {displayed_filedata != null &&
+                                            <table style={{
+                                                borderCollapse: 'collapse',
+                                                border: '1px solid black',
+                                                padding: '10px',
+                                            }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ border: '1px solid black', padding: '10px' }}>Section</th>
+                                                        <th style={{ border: '1px solid black', padding: '10px' }}>Details</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>Transcript</td>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>{displayed_filedata['transcript']}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>Entities</td>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>{displayed_filedata['entities']}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>Summary</td>
+                                                        <td style={{ border: '1px solid black', padding: '10px' }}>{displayed_filedata['summary']}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        }
+                                    </div>
                                     {msg.file && (
                                         <div className="text-sm mt-1 opacity-80">
                                             <i className="fas fa-paperclip mr-1"></i>
@@ -286,9 +304,28 @@ const App = () => {
                         onClick={handleUploadButtonClick}
                         className="p-3 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-sm"
                         title="Upload File"
+                        style={{ position: 'relative', display: 'inline-block' }} 
+                        ref={menuRef}
                     >
                         <i className="fas fa-paperclip text-xl"></i>
                     </button>
+
+                    {isOpen && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            backgroundColor: '#fff',
+                            border: '1px solid #ccc',
+                            padding: '10px',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                            zIndex: 1000,
+                        }}>
+                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 1</div>
+                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 2</div>
+                            <div style={{ padding: '5px 10px', cursor: 'pointer' }}>Option 3</div>
+                        </div>
+                    )}
 
                     <input
                         type="text"
@@ -321,7 +358,7 @@ const App = () => {
                 {`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
                 body {
-                    font-family: 'Inter', sans-serif;
+                    font-family: 'Inter', sans-serif; 
                 }
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 8px;
