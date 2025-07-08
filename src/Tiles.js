@@ -37,7 +37,7 @@ const TaskCardGrid = () => {
         <div className="min-h-screen bg-gray-100">
             <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 shadow-lg flex items-center justify-center">
                 <h1 className="text-2xl font-bold">
-                    Conversational Assistant
+                    Trafodion
                 </h1>
             </header>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-5 ">
