@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HoverCard from './HoverCard';
 
 
 const sampleTasks = [
-    { id:1, title: 'Call Summarization', color: 'bg-purple-100', bar: 'bg-purple-500', text: 'text-purple-600' },
-    { id:2, title: 'Chat With Document', color: 'bg-blue-100', bar: 'bg-blue-500', text: 'text-blue-600' },
-    { id:3, title: 'Text Conversation', color: 'bg-green-100', bar: 'bg-green-500', text: 'text-green-600' },
-    { id:4, title: 'n8n Workflow', color: 'bg-red-100', bar: 'bg-red-500', text: 'text-red-600' },
+    { id: 1, title: 'Call Summarization', summary1:"Call Summarization", summary2:"call summarization", color: 'bg-purple-100', bar: 'bg-purple-500', text: 'text-purple-600' },
+    { id: 2, title: 'Chat With Document', summary1:"Chat With Documen", summary2:"Chat With Documen",color: 'bg-blue-100', bar: 'bg-blue-500', text: 'text-blue-600' },
+    { id: 3, title: 'Text Conversation', summary1:"Text Conversation", summary2:"Text Conversation",color: 'bg-green-100', bar: 'bg-green-500', text: 'text-green-600' },
+    { id: 4, title: 'n8n Workflow', summary1:"n8n Workflow", summary2:"n8n Workflow",color: 'bg-red-100', bar: 'bg-red-500', text: 'text-red-600' },
 ];
 
 const TaskCardGrid = () => {
@@ -17,26 +18,13 @@ const TaskCardGrid = () => {
         navigate(`/chat/`);
     };
 
-
-    const addCard = () => {
-        const newTask = {
-            title: 'New Task',
-            progress: Math.floor(Math.random() * 100),
-            due: '2 Days Left',
-            color: 'bg-yellow-100',
-            bar: 'bg-yellow-500',
-            text: 'text-yellow-600'
-        };
-        setTasks((prev) => [...prev, newTask]);
-    };
-
     const handleCardClick = (task) => {
-        if(task.id ===4){
+        if (task.id === 4) {
             n8nWorkflowLink()
-        }else {
+        } else {
             gotochat()
         }
-        
+
     };
 
     const n8nWorkflowLink = () => {
@@ -45,6 +33,7 @@ const TaskCardGrid = () => {
 
     };
 
+    
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -55,11 +44,10 @@ const TaskCardGrid = () => {
             </header>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 m-5 ">
                 {tasks.map((task, idx) => (
-                    <div key={idx} className={`aspect-square bg-white rounded-xl p-24 shadow ${task.color}`}
+                    <div key={idx} className={`bg-white rounded-xl shadow ${task.color} justify-center`}
                         onClick={() => handleCardClick(task)}
                     >
-                        <h2 className="text-center text-lg font-semibold mt-2 ">{task.title}</h2>
-
+                        <HoverCard task={task}/>
                     </div>
                 ))}
 

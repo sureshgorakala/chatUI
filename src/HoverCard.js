@@ -1,38 +1,28 @@
 import React from 'react';
+import './App.css'; // make sure tailwind is imported here
 
-const HoverCard = ({ title, progress, color = 'bg-purple-200', barColor = 'bg-purple-600' }) => {
+const HoverCard = ({ task })  => {
+  console.log(task)
   return (
-    <div className={`relative overflow-hidden rounded-xl shadow-md ${color} h-56 p-4`}>
-      {/* Top Content */}
-      <div>
-        <p className="text-sm text-gray-600">December 10, 2020</p>
-        <h2 className="text-lg font-semibold mt-1">{title}</h2>
-        <p className="text-sm text-gray-500 mb-4">Prototyping</p>
-        <div className="text-sm font-medium text-gray-700 mb-1">Progress</div>
-        <div className="w-full bg-gray-300 rounded-full h-2.5 mb-2">
-          <div className={`h-2.5 rounded-full ${barColor}`} style={{ width: `${progress}%` }}></div>
-        </div>
-        <div className="text-right text-sm font-semibold text-gray-700">{progress}%</div>
-      </div>
+    <div className="w-auto h-52 relative overflow-hidden rounded-xl shadow-lg group cursor-pointer">
+      {/* Background image or content */}
+      {/*<img
+        src="https://www.crmbuyer.com/wp-content/uploads/sites/4/2024/04/customer-service-agent-smiling.jpg"
+        alt="Nature"
+        className="w-full h-full object-cover"
+      />*/}
 
-      {/* Hidden Bottom Panel (revealed on hover) */}
-      <div
-        className="absolute bottom-0 left-0 w-full px-4 py-3 bg-white text-sm text-gray-700 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out rounded-b-xl"
-      >
-        <p>Details: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        <div className="mt-2 flex items-center justify-between">
-          <div className="flex -space-x-2">
-            {[1, 2, 3].map((i) => (
-              <img
-                key={i}
-                src={`https://i.pravatar.cc/40?img=${i}`}
-                alt="avatar"
-                className="w-6 h-6 rounded-full border-2 border-white"
-              />
-            ))}
-          </div>
-          <span className="text-red-500 font-semibold">2 Days Left</span>
-        </div>
+      <h2 className="absolute inset-0 flex items-center justify-center text-lg font-semibold">
+  {task.title}
+</h2>
+
+
+      {/* Overlay - hidden initially, slides up on hover */}
+      <div className="absolute bottom-0 left-0 w-full h-1/2 bg-black bg-opacity-50 text-white p-20
+                      flex flex-col justify-end transform translate-y-full group-hover:translate-y-10
+                      transition-transform duration-500 ease-in-out">
+        <h2 className="text-lg font-semibold">{task.summary1}</h2>
+        <p className="text-sm">{task.summary2}</p>
       </div>
     </div>
   );
