@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const App = () => {
     const [messages, setMessages] = useState([]);
@@ -8,10 +9,15 @@ const App = () => {
     const messagesEndRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef(null);
+    const navigate = useNavigate();
 
     const [previousChats, setPreviousChats] = useState([
         "Previous chat here"
     ]);
+
+    const handleClick = (id) => {
+        navigate(`/`);
+    };
 
     const toggleMenu = () => setIsOpen(prev => !prev);
     useEffect(() => {
@@ -177,7 +183,9 @@ const App = () => {
         <div className="flex h-screen bg-gray-100 font-sans antialiased overflow-hidden">
             <div className={` w-64 bg-gray-900 text-white p-4 shadow-lg z-10`}>
                 <div className="mb-6">
-                    <h2 className="text-3xl font-bold text-blue-400 mb-4 flex items-center">
+                    <h2 className="text-3xl font-bold text-blue-400 mb-4 flex items-center"
+                        onClick={handleClick}
+                    >
                         <i className="fas fa-gem mr-2 text-blue-300"></i>Trafodion
                     </h2>
                     <button
