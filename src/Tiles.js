@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 
 
 const sampleTasks = [
-    { title: 'Call Summarization', color: 'bg-purple-100', bar: 'bg-purple-500', text: 'text-purple-600' },
-    { title: 'Chat With Document', color: 'bg-blue-100', bar: 'bg-blue-500', text: 'text-blue-600' },
-    { title: 'Text Conversation', color: 'bg-green-100', bar: 'bg-green-500', text: 'text-green-600' },
+    { id:1, title: 'Call Summarization', color: 'bg-purple-100', bar: 'bg-purple-500', text: 'text-purple-600' },
+    { id:2, title: 'Chat With Document', color: 'bg-blue-100', bar: 'bg-blue-500', text: 'text-blue-600' },
+    { id:3, title: 'Text Conversation', color: 'bg-green-100', bar: 'bg-green-500', text: 'text-green-600' },
+    { id:4, title: 'n8n Workflow', color: 'bg-red-100', bar: 'bg-red-500', text: 'text-red-600' },
 ];
 
 const TaskCardGrid = () => {
     const [tasks, setTasks] = useState(sampleTasks);
     const navigate = useNavigate();
 
-    const handleClick = (id) => {
+    const gotochat = (id) => {
         navigate(`/chat/`);
     };
 
@@ -30,8 +31,20 @@ const TaskCardGrid = () => {
     };
 
     const handleCardClick = (task) => {
-        handleClick()
+        if(task.id ===4){
+            n8nWorkflowLink()
+        }else {
+            gotochat()
+        }
+        
     };
+
+    const n8nWorkflowLink = () => {
+        //window.location.href = 'http://44.223.11.40:5678/webhook/a889d2ae-2159-402f-b326-5f61e90f602e/chat';
+        window.open('http://44.223.11.40:5678/webhook/a889d2ae-2159-402f-b326-5f61e90f602e/chat', '_blank', 'noopener,noreferrer');
+
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-100">
