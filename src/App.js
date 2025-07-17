@@ -89,9 +89,10 @@ const App = () => {
             setIsLoading(true);
             try {
 
+                
                 console.log("newMessage", newMessage)
 
-                const url = `http://44.223.11.40:8000/api/query`
+                const url = `http://app.trafodion.click:8000/api/query`
                 const result = await createHttpRequest(url)
 
                 if (result.answer && result.answer.length > 0) {
@@ -144,9 +145,9 @@ const App = () => {
         let isAudio = false;
         if (allowedAudioExtensions.includes(extension)) {
             isAudio = true;
-            url = 'http://44.223.11.40:8001/upload-call'
+            url = 'http://app.trafodion.click:8001/upload-call'
         } else {
-            url = 'http://44.223.11.40:8000/api/upload'
+            url = 'http://app.trafodion.click:8000/api/upload'
         }
 
 
