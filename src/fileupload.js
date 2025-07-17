@@ -13,7 +13,7 @@ function FileUpload() {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('http://44.223.11.40:8001/upload-call', {
+    fetch('http://app.trafodion.click:8001/upload-call', {
       method: 'POST',
       body: formData,
     })
